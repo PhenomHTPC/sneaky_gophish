@@ -18,7 +18,7 @@ RUN mkdir -p /go/src/github.com/gophish/gophish
 WORKDIR /go/src/github.com/gophish/gophish
 RUN git clone https://github.com/gophish/gophish .
 
-# Stripping X-Gophish 
+# Stripping X-Gophish
 RUN sed -i 's/X-Gophish-Contact/X-Contact/g' models/email_request_test.go
 RUN sed -i 's/X-Gophish-Contact/X-Contact/g' models/maillog.go
 RUN sed -i 's/X-Gophish-Contact/X-Contact/g' models/maillog_test.go
@@ -53,18 +53,20 @@ WORKDIR /opt/gophish
 COPY --from=build-golang /go/src/github.com/gophish/gophish/ ./
 COPY --from=build-js /build/static/js/dist/ ./static/js/dist/
 COPY --from=build-js /build/static/css/dist/ ./static/css/dist/
-COPY --from=build-golang /go/src/github.com/gophish/gophish/config.json ./
+#COPY --from=build-golang /go/src/github.com/gophish/gophish/config.json ./
 COPY ./files/404.html ./templates/
+COPY ./files/config.json ./
+COPY ./files//cert.pem ./
+COPY ./files/privkey.pem ./
 RUN chown app. config.json
 
 RUN setcap 'cap_net_bind_service=+ep' /opt/gophish/gophish
 
 USER app
-RUN sed -i 's/127.0.0.1/0.0.0.0/g' config.json
-
+#RUN sed -i 's/127.0.0.1/0.0.0.0/g' config.json
 
 RUN touch config.json.tmp
 
-EXPOSE 3333 80
+EXPOSE 3333
 
 CMD ["./docker/run.sh"]
